@@ -28,9 +28,9 @@ public class ChatServerThread extends Thread {
 		try {			
 			br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
 			pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"), true);
-					
 			while (true) {
 				String data = br.readLine();
+				System.out.println(data);
 				if(nickname!=null) {
 					System.out.println(nickname+"> "+data);
 				}
