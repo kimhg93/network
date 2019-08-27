@@ -9,15 +9,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 
-public class TCPServer {
+public class TCPServer1 {
 	private static final int PORT = 5555;
 	public static void main(String[] args) {
 		// 1. 서버소켓 생성
 		ServerSocket serverSocket = null;
 		try {
 			serverSocket = new ServerSocket();
-			//1-1 Time-wait 상태에서 서버소켓에 즉시 사용하기위해......
-			serverSocket.setReuseAddress(true);
 			
 			//2. Binding: Socket에 SocketAddress(IPAddress + Port)를 바인딩 한다.
 			InetAddress inetAddress = InetAddress.getLocalHost();			
@@ -50,11 +48,6 @@ public class TCPServer {
 					System.out.println("[TCPServer] received > "+data);
 					
 					//6. 데이터 쓰기
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
 					os.write(data.getBytes("utf-8"));
 				}				
 			} catch(SocketException e) {
