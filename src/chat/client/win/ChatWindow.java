@@ -102,6 +102,7 @@ public class ChatWindow extends Thread {
 		// Frame
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
+				pw.println("quit/");
 				System.exit(0);
 			}
 		});
