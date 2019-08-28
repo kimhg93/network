@@ -13,14 +13,14 @@ import java.util.List;
 public class ChatServerThread extends Thread {
 	private String nickname;
 	private Socket socket;
-	private List<Writer> listWriters;
+	private List<User> usersList;
 	private BufferedReader br;
 	private PrintWriter pw;
+	User user = new User();
 	
-	
-	public ChatServerThread(Socket socket, List<Writer> listWriters) {
+	public ChatServerThread(Socket socket, List<User> usersList) {
 		this.socket = socket;
-		this.listWriters = listWriters;
+		this.usersList = usersList;
 	}
 
 	@Override
@@ -34,8 +34,7 @@ public class ChatServerThread extends Thread {
 				if(nickname!=null) {
 					System.out.println(nickname+"> "+data);
 				}
-				if(data == null) {
-					doQuit(pw);
+				if(data == null) {					
 					break;
 				}				
 				
@@ -45,13 +44,16 @@ public class ChatServerThread extends Thread {
 				} else if(tokens[0].equals("msg")) {
 					doMessage(tokens[1]);					
 				} else if(tokens[0].equals("quit")) {
-					doQuit(pw);
-				} else {
+					doQuit(user);
+				} else if(tokens[0].equals("dm")) {					
+					doDirectMsg(tokens[1], tokens[2]);
+				}
+				else {
 					ChatServer.log("알수 없는 요청: "+tokens[0]);
 				}				
 			}
 		} catch (SocketException e) {
-			System.out.println("소켓이 ?"+e);
+			System.out.println("누군가 나갔다");
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -66,27 +68,44 @@ public class ChatServerThread extends Thread {
 		}
 	}
 	
-	private void doJoin(String nickname, Writer writer) {
-		this.nickname = nickname;		
+	private void doJoin(String nickname, Writer writer) {		
+		this.nickname = nickname;				
 		String data = nickname +"님이 참여하였습니다.";
 		System.out.println(nickname + "join");
+		pw.println("join/ok");
 		broadcast(data);
-		addWriter(writer);		
+		user.setName(nickname);
+		user.setWriter(writer);		
+		addWriter(writer, user);		
+		
 	}
 	
-	private void addWriter(Writer writer) {
-		synchronized(listWriters) {
-			listWriters.add(writer);
+	private void addWriter(Writer writer, User user) {
+		synchronized(usersList) {
+			usersList.add(user);
 		}
 	}
 	
 	private void broadcast(String sendmsg) {
-		synchronized(listWriters) {
-			for(Writer writer:listWriters) {
-				pw = (PrintWriter)writer;
-				//System.out.println("broad>>"+sendmsg);
+		synchronized(usersList) {
+			for(User user:usersList) {
+				pw = (PrintWriter)user.getWriter();
+				///System.out.println("broad>>"+sendmsg);
 				pw.println(sendmsg);
 			}
+		}
+	}
+	
+	private void doDirectMsg(String userName, String sendmsg) {
+		for(User user:usersList) {
+			if(user.getName().equals(userName)) {
+				pw = (PrintWriter)user.getWriter();				
+				pw.println(nickname+":"+sendmsg);
+			}				
+			if(user.getName().equals(nickname)) {
+				pw = (PrintWriter)user.getWriter();				
+				pw.println(nickname+":"+sendmsg);
+			}	
 		}
 	}
 	
@@ -95,17 +114,17 @@ public class ChatServerThread extends Thread {
 		broadcast(nickname+": "+sendmsg);
 	}
 	
-	private void doQuit(Writer writer) {
+	private void doQuit(User user) {
 		//System.out.println("doquit");				
 		String data = nickname + "님이 퇴장했음";		
 		broadcast(data);
-		removeWriter(writer);
+		removeWriter(user);
 		
 	}
 	
-	private void removeWriter(Writer writer) {
-		synchronized(listWriters) {
-			listWriters.remove(writer);
+	private void removeWriter(User user) {
+		synchronized(usersList) {
+			usersList.remove(user);
 		}
 	}
 

@@ -18,8 +18,7 @@ public class ChatClientThread extends Thread {
 			while(true) {
 				//System.out.println("클라이언트 스레드 호출!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 				BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(),"UTF-8"));
-				String data = br.readLine();
-				
+				String data = br.readLine();				
 				if(data.equals("join/ok")) {
 					System.out.println("채팅에 접속 됨");
 				} else {

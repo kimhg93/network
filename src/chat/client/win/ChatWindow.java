@@ -108,19 +108,24 @@ public class ChatWindow extends Thread {
 		});
 		frame.setVisible(true);
 		frame.pack();	
-		pw.println("join/"+name);
 		this.run();
 	}
+	
 	private void updateTestArea(String message) {
 		textArea.append(message);
 		textArea.append("\n");
 	}
+	
 	private void sendMessage() {
 		System.out.println(socket.getRemoteSocketAddress());
 		String message = textField.getText();
-		pw.println("msg/"+message);
+		String[] tokens = message.split("/");
+		if(tokens[0].equals("dm")) {
+			pw.println("dm/"+tokens[1]+"/"+tokens[2]);
+		} else {
+			pw.println("msg/"+message);
+		}
 		System.out.println("send "+message);
-		//updateTestArea(message);
 		textField.setText("");
 		textField.requestFocus();
 	

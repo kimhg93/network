@@ -1,8 +1,6 @@
 package chat;
 
 import java.io.IOException;
-import java.io.Writer;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -10,20 +8,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChatServer {
-	private static final int PORT = 9993;
+	private static final int PORT = 9991;
 
 	public static void main(String[] args) {
 		ServerSocket serverSocket = null;
-		List<Writer> listWriters = new ArrayList<Writer>();
+		List<User> usersList = new ArrayList<User>();
 		try {
 			serverSocket = new ServerSocket();
-			String hostAddress = InetAddress.getLocalHost().getHostAddress();
+			//String hostAddress = InetAddress.getLocalHost().getHostAddress();
+			String hostAddress = "127.0.0.1";
 			System.out.println(hostAddress);
 			serverSocket.bind(new InetSocketAddress(hostAddress, PORT));
 
 			while (true) {
 				Socket socket = serverSocket.accept();
-				new ChatServerThread(socket, listWriters).start();
+				new ChatServerThread(socket, usersList).start();
 			}			
 			
 		} catch (IOException e) {

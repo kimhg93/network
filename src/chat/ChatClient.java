@@ -1,6 +1,8 @@
 package chat;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
@@ -9,8 +11,8 @@ import java.net.SocketException;
 import java.util.Scanner;
 
 public class ChatClient {
-	private static final int SERVER_PORT = 9993;
-	private static final String SERVER_IP = "192.168.56.1";
+	private static final int SERVER_PORT = 9994;
+	private static final String SERVER_IP = "127.0.0.1";
 
 	public static void main(String[] args) {
 		Scanner sc = null;
@@ -20,19 +22,18 @@ public class ChatClient {
 			socket = new Socket();
 			socket.connect(new InetSocketAddress(SERVER_IP, SERVER_PORT));
 
-			log("Connected");
-
 			PrintWriter pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"), true);
-
+			BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(),"UTF-8"));
+			
 			System.out.print("닉네임 입력 >>");
 			String nickname = sc.nextLine();
-			pw.println("join/" + nickname);	
-			System.out.println("join 실행");
+			 pw.println("join/" + nickname);
+			 if(br.readLine().equals("join/ok")) {	
+				 new ChatClientThread(socket).start(); 
+				 log("Connected");
+			 }
 			 
-			new ChatClientThread(socket).start();
 			while (true) {
-
-				// 5. 키보드 입력 받기
 				System.out.print(">");
 				String input = sc.nextLine();
 
@@ -45,7 +46,7 @@ public class ChatClient {
 				pw.flush();
 			}
 		} catch (SocketException e) {
-			System.out.println("소켓에러");
+			System.out.println("소켓에러 "+e);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
