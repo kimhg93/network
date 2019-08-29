@@ -59,6 +59,10 @@ public class ChatServerThread extends Thread {
 		}
 	}
 	
+	private void removeRoom() {
+		
+	}
+	
 	private void newRoom(String roomname) {
 		//System.out.println("newRoom");
 		user.setChatRoom(roomname);		
@@ -78,10 +82,6 @@ public class ChatServerThread extends Thread {
 	private void sendRoom(String sendmsg) {
 		System.out.println("현재참여 방 확인 >>>>"+this.roomname);
 		for(User user:usersList) {
-			if(user.getChatRoom().equals(roomname)) {
-				pw = (PrintWriter)user.getWriter();				
-				pw.println(nickname+":"+sendmsg);
-			}				
 			if(user.getChatRoom().equals(roomname)) {
 				pw = (PrintWriter)user.getWriter();				
 				pw.println(nickname+":"+sendmsg);
@@ -112,15 +112,13 @@ public class ChatServerThread extends Thread {
 		synchronized(usersList) {
 			rooms.add(roomname);
 		}
-	}
-	
+	}	
 	
 	private void addWriter(User user) {
 		synchronized(usersList) {			
 			usersList.add(user);
 		}
-	}
-	
+	}	
 	
 	private void doDirectMsg(String userName, String sendmsg) {
 		for(User user:usersList) {
@@ -161,8 +159,6 @@ public class ChatServerThread extends Thread {
 		} else if(tokens[0].equals("goroom")) {
 			this.roomname = tokens[1];
 			goRoom(tokens[1]);
-		} else if(tokens[0].equals("sndroom")) {
-			sendRoom(tokens[1]);
 		} else {
 			ChatServer.log("알수 없는 요청: "+tokens[0]);
 		}	

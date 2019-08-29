@@ -119,13 +119,15 @@ public class ChatWindow extends Thread {
 	private void sendMessage() {
 		System.out.println(socket.getRemoteSocketAddress());
 		String message = textField.getText();
+		if(message==null||message=="") {
+			message+=" ";
+		}
 		String[] tokens = message.split("/");
 		if(tokens[0].equals("dm")) {
-			pw.println("dm/"+tokens[1]+"/"+tokens[2]);
+			pw.println("dm/"+tokens[1]+"/"+tokens[2]+" ");
 		} else {
-			pw.println("msg/"+message);
+			pw.println("msg/"+message+" ");
 		}
-		System.out.println("send "+message);
 		textField.setText("");
 		textField.requestFocus();
 	
