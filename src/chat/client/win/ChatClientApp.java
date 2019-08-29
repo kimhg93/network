@@ -15,6 +15,7 @@ public class ChatClientApp {
 
 	public static void main(String[] args) {
 		String name = null;
+		String room = null;
 		Scanner sc = new Scanner(System.in);
 		Socket socket = null;		
 		try {
@@ -38,8 +39,19 @@ public class ChatClientApp {
 				System.out.println("대화명은 한글자 이상 입력해야 합니다.\n");
 			}
 			 if(br.readLine().equals("join/ok")) {	
-				 log("Connected");
-				 new ChatWindow(name, socket).show();			 
+				log("Connected");				 
+			 	String rooms = br.readLine();
+			 	System.out.println(rooms);
+				room = sc.nextLine();				
+				if(room.isEmpty()==false) {		
+					System.out.println("nwroom!!");
+					System.out.println(room+"<<scanner");
+					pw.println(room);							
+				} else {
+					System.out.println("goroom!!");
+					pw.println(room);
+				}
+				new ChatWindow(name, socket).show(); 
 			 }
 			
 			

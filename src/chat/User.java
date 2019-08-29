@@ -5,7 +5,14 @@ import java.io.Writer;
 public class User {
 	private String name;
 	private Writer writer;
+	private	String chatRoom;
 	
+	public String getChatRoom() {
+		return chatRoom;
+	}
+	public void setChatRoom(String chatRoom) {
+		this.chatRoom = chatRoom;
+	}
 	public String getName() {
 		return name;
 	}

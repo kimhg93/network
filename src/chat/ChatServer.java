@@ -13,6 +13,7 @@ public class ChatServer {
 	public static void main(String[] args) {
 		ServerSocket serverSocket = null;
 		List<User> usersList = new ArrayList<User>();
+		List<String> rooms = new ArrayList<String>();
 		try {
 			serverSocket = new ServerSocket();
 			//String hostAddress = InetAddress.getLocalHost().getHostAddress();
@@ -22,7 +23,7 @@ public class ChatServer {
 
 			while (true) {
 				Socket socket = serverSocket.accept();
-				new ChatServerThread(socket, usersList).start();
+				new ChatServerThread(socket, usersList, rooms).start();
 			}			
 			
 		} catch (IOException e) {
