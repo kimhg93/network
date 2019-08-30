@@ -55,6 +55,9 @@ public class ChatWindow extends Thread {
 				System.out.println("스레드");
 				BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(),"UTF-8"));
 				String data = br.readLine();
+				if(data.equals("kill")) {
+					quit();
+				}
 				updateTestArea(data);
 				System.out.println("?"+data);
 			} catch (UnsupportedEncodingException e) {
@@ -102,13 +105,17 @@ public class ChatWindow extends Thread {
 		// Frame
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				pw.println("quit/");
-				System.exit(0);
+				quit();
 			}
 		});
 		frame.setVisible(true);
 		frame.pack();	
 		this.run();
+	}
+	
+	private void quit() {
+		pw.println("quit/");
+		System.exit(0);
 	}
 	
 	private void updateTestArea(String message) {
@@ -125,6 +132,8 @@ public class ChatWindow extends Thread {
 		String[] tokens = message.split("/");
 		if(tokens[0].equals("dm")) {
 			pw.println("dm/"+tokens[1]+"/"+tokens[2]+" ");
+		} else if(tokens[0].equals("kill")){
+			pw.println(message);
 		} else {
 			pw.println("msg/"+message+" ");
 		}

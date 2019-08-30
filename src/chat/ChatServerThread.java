@@ -59,13 +59,22 @@ public class ChatServerThread extends Thread {
 		}
 	}
 	
-	private void removeRoom() {
-		
+	private void removeRoom(String roomname) {
+		int cnt = 0;
+		for(User user:usersList) {
+			user.getChatRoom().equals(roomname);
+			cnt++;
+		}
+		System.out.println(cnt);
+		if(cnt==1) {
+			rooms.remove(roomname);
+		}
 	}
 	
 	private void newRoom(String roomname) {
 		//System.out.println("newRoom");
 		user.setChatRoom(roomname);		
+		user.setRank(1);
 		addRoom(roomname);
 		addWriter(user);		
 	}
@@ -75,8 +84,7 @@ public class ChatServerThread extends Thread {
 		user.setChatRoom(roomname);
 		addWriter(user);		
 		String data = "님이 참여하였습니다.";
-		sendRoom(data);
-		
+		sendRoom(data);		
 	}
 	
 	private void sendRoom(String sendmsg) {
@@ -100,14 +108,14 @@ public class ChatServerThread extends Thread {
 				System.out.println("현재 방"+room);
 			} 
 			System.out.println(roomlist);
-			pw.println("현재 생성된 방"+roomlist+" 접속할 방을 선택하시오(방생성 -> nwroom/방이름, 방참여 -> goroom/방이름");
+			pw.println("현재 생성된 방"+roomlist+" 접속할 방을 선택하시오(방생성 -> nwroom/방이름, 방참여 -> goroom/방이름)");
 		} else {
-			pw.println("현재 생성된 방이 없다. 접속할 방을 선택하시오(방생성 -> nwroom/방이름");			
+			pw.println("현재 생성된 방이 없다.방을 생성 하시오(방생성 -> nwroom/방이름");			
 		}
 		user.setName(nickname);
-		user.setWriter(writer);		
-		
+		user.setWriter(writer);				
 	}
+	
 	private void addRoom(String room) {
 		synchronized(usersList) {
 			rooms.add(roomname);
@@ -132,16 +140,38 @@ public class ChatServerThread extends Thread {
 	private void doQuit(User user) {
 		//System.out.println("doquit");		
 		//String data = nickname + "님이 퇴장했음";
+		if(user.getRank()==1) {
+			ownerOut();
+		}
 		String data = "님이 퇴장했음";		
-		sendRoom(data);
-		removeWriter(user);
-		
+		sendRoom(data);		
+		removeRoom(user.getChatRoom());
+		removeWriter(user);		
+	}
+	
+	private void ownerOut() {		
+		user.setRank(0);
+		System.out.println("랭크넘기기"+user.getName());
+		double drandom = Math.random();
+	    int irandom = (int)(drandom * usersList.size());
+	    usersList.get(irandom).setRank(1);
+	    pw = (PrintWriter) usersList.get(irandom).getWriter();
+	    pw.println("방장이 되었다");
 	}
 	
 	private void removeWriter(User user) {
 		synchronized(usersList) {
 			usersList.remove(user);
 		}
+	}
+	
+	private void killUser(String killname) {		
+		for(User user:usersList) {
+			if(user.getName().equals(killname)) {
+				pw = (PrintWriter)user.getWriter();		
+				pw.println("kill");
+			}	
+		}		
 	}
 	
 	private void protocol(String tokens[]) {
@@ -159,7 +189,14 @@ public class ChatServerThread extends Thread {
 		} else if(tokens[0].equals("goroom")) {
 			this.roomname = tokens[1];
 			goRoom(tokens[1]);
+		} else if(tokens[0].equals("kill")){
+			if(user.getRank()==1) {
+				killUser(tokens[1]);
+			} else {
+				this.pw.println("강퇴권한이 없음");
+			}
 		} else {
+
 			ChatServer.log("알수 없는 요청: "+tokens[0]);
 		}	
 	}
